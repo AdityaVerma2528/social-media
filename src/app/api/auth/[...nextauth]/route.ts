@@ -15,19 +15,25 @@ const handler = NextAuth({
         })
     ],
     callbacks: {
-        async signIn(params) {
-            if (!params.user || !params.user.email) {
-                console.log("Invalid user payload:", params);
+        async signIn({ user }) {
+            if (!user || !user.email) {
+                console.log("Invalid user payload:", user);
                 return false; 
             }
-            
+        
             try {
-                await prisma.user.create({
-                    data: {
-                        email: params.user.email, 
-                        name: params.user.name ?? ""
-                    }
-                });
+                const existingUser = await prisma.user.findUnique({
+                    where: { email: user.email }, 
+                }
+                                                                  
+                if (!existingUser) {
+                    await prisma.user.create({
+                        data: {
+                            email: user.email, 
+                            name: user.name ?? ""
+                        }
+                    });
+                }
             } catch (e) {
                 console.error("Error creating user:", e);
             }
