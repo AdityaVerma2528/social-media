@@ -24,7 +24,7 @@ const handler = NextAuth({
             try {
                 const existingUser = await prisma.user.findUnique({
                     where: { email: user.email }, 
-                }
+                })
                                                                   
                 if (!existingUser) {
                     await prisma.user.create({
